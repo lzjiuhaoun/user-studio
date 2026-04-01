@@ -131,7 +131,7 @@ function renderSitesGrid(sites) {
     }
 
     grid.innerHTML = sites.map(site => {
-        const iconUrl = escapeHtml(site.icon || getFaviconUrl(site.url));
+        const iconUrl = site.icon ? encodeURI(site.icon) : getFaviconUrl(site.url);
         return `
             <div class="site-card" data-id="${escapeHtml(site.id)}">
                 <div class="card-actions">
