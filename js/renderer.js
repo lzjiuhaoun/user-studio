@@ -28,7 +28,10 @@ export function renderCategories() {
             <li data-id="${escapeHtml(cat.id)}" class="${currentCategoryId === cat.id ? 'active' : ''}">
                 <span class="color-dot" style="background-color: ${cat.color}"></span>
                 <span>${escapeHtml(cat.name)}</span>
-                ${cat.id !== 'default' ? `<button class="delete-category" data-id="${escapeHtml(cat.id)}">×</button>` : ''}
+                ${cat.id !== 'default' ? `
+            <button class="edit-category" data-id="${escapeHtml(cat.id)}">✎</button>
+            <button class="delete-category" data-id="${escapeHtml(cat.id)}">×</button>
+        ` : ''}
             </li>
         `).join('')}
     `;
@@ -52,6 +55,13 @@ export function renderCategories() {
                         renderCategories();
                         renderSites();
                     });
+                }
+            } else if (e.target.classList.contains('edit-category')) {
+                e.stopPropagation();
+                const id = e.target.dataset.id;
+                const category = data.categories.find(c => c.id === id);
+                if (category) {
+                    openCategoryModal(category);
                 }
             } else {
                 currentCategoryId = li.dataset.id;
