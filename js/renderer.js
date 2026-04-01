@@ -8,7 +8,11 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// 默认图标 SVG
+const DEFAULT_ICON_SVG = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#4a5568"/><text x="50" y="68" font-size="50" text-anchor="middle" fill="#fff">🌐</text></svg>');
+
 let currentCategoryId = 'all';
+let allSites = []; // 存储所有站点用于搜索过滤
 
 // 渲染分类列表
 export function renderCategories() {
@@ -16,12 +20,12 @@ export function renderCategories() {
     const select = document.getElementById('site-category');
     const data = storage.getData();
 
-    if (!data) return;
+    if (!list || !select || !data) return;
 
     // 渲染侧边栏分类列表
     list.innerHTML = `
         <li data-id="all" class="${currentCategoryId === 'all' ? 'active' : ''}">
-            <span class="color-dot" style="background-color: #e94560"></span>
+            <span class="color-dot" style="background-color: #667eea"></span>
             <span>全部网站</span>
         </li>
         ${data.categories.map(cat => `
@@ -29,9 +33,9 @@ export function renderCategories() {
                 <span class="color-dot" style="background-color: ${cat.color}"></span>
                 <span>${escapeHtml(cat.name)}</span>
                 ${cat.id !== 'default' ? `
-            <button class="edit-category" data-id="${escapeHtml(cat.id)}">✎</button>
-            <button class="delete-category" data-id="${escapeHtml(cat.id)}">×</button>
-        ` : ''}
+                    <button class="edit-category" data-id="${escapeHtml(cat.id)}">✎</button>
+                    <button class="delete-category" data-id="${escapeHtml(cat.id)}">×</button>
+                ` : ''}
             </li>
         `).join('')}
     `;
@@ -40,6 +44,9 @@ export function renderCategories() {
     select.innerHTML = data.categories.map(cat =>
         `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`
     ).join('');
+
+    // 保存所有站点用于搜索
+    allSites = data.sites || [];
 
     // 绑定分类点击事件
     list.querySelectorAll('li[data-id]').forEach(li => {
@@ -72,17 +79,51 @@ export function renderCategories() {
     });
 }
 
-// 渲染网站卡片网格
-export function renderSites() {
+// 过滤显示站点（搜索用）
+export function filterSites(query) {
     const grid = document.getElementById('sites-grid');
     const data = storage.getData();
 
     if (!data) return;
 
     let sites = data.sites;
+
+    // 按分类过滤
     if (currentCategoryId !== 'all') {
         sites = sites.filter(s => s.categoryId === currentCategoryId);
     }
+
+    // 按搜索关键词过滤
+    if (query) {
+        const lowerQuery = query.toLowerCase();
+        sites = sites.filter(s =>
+            s.name.toLowerCase().includes(lowerQuery) ||
+            s.url.toLowerCase().includes(lowerQuery)
+        );
+    }
+
+    // 渲染过滤后的站点
+    renderSitesGrid(sites);
+}
+
+// 渲染网站卡片网格
+export function renderSites() {
+    const data = storage.getData();
+    if (!data) return;
+
+    let sites = data.sites;
+    if (currentCategoryId !== 'all') {
+        sites = sites.filter(s => s.categoryId === currentCategoryId);
+    }
+
+    allSites = data.sites;
+    renderSitesGrid(sites);
+}
+
+// 渲染网站卡片网格（内部方法）
+function renderSitesGrid(sites) {
+    const grid = document.getElementById('sites-grid');
+    if (!grid) return;
 
     if (sites.length === 0) {
         grid.innerHTML = '<div class="empty-state">暂无网站，点击右上角添加</div>';
@@ -92,18 +133,19 @@ export function renderSites() {
     grid.innerHTML = sites.map(site => {
         const iconUrl = escapeHtml(site.icon || getFaviconUrl(site.url));
         return `
-            <div class="site-card" data-id="${escapeHtml(site.id)}" style="background-color: ${site.bgColor || 'var(--card-bg)'}">
+            <div class="site-card" data-id="${escapeHtml(site.id)}">
                 <div class="card-actions">
                     <button class="edit-btn" data-id="${escapeHtml(site.id)}">✎</button>
                     <button class="delete-btn" data-id="${escapeHtml(site.id)}">×</button>
                 </div>
-                <img src="${iconUrl}" alt="${escapeHtml(site.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🌐</text></svg>'">
+                <img src="${iconUrl}" alt="${escapeHtml(site.name)}" onerror="this.src='${DEFAULT_ICON_SVG}'">
                 <span class="site-name">${escapeHtml(site.name)}</span>
             </div>
         `;
     }).join('');
 
     // 绑定卡片事件
+    const data = storage.getData();
     grid.querySelectorAll('.site-card').forEach(card => {
         const id = card.dataset.id;
 
@@ -149,14 +191,30 @@ export function getFaviconUrl(url) {
     }
 }
 
+// 检测图标是否可加载
+export function checkIconLoadable(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+    });
+}
+
 // 打开网站模态框
 export function openSiteModal(site = null) {
     const modal = document.getElementById('site-modal');
     const title = document.getElementById('site-modal-title');
     const form = document.getElementById('site-form');
+    const iconStatus = document.getElementById('icon-status');
 
     title.textContent = site ? '编辑网站' : '添加网站';
     form.reset();
+
+    if (iconStatus) {
+        iconStatus.textContent = '自动获取或手动输入';
+        iconStatus.classList.remove('error');
+    }
 
     if (site) {
         document.getElementById('site-id').value = site.id;
@@ -164,10 +222,10 @@ export function openSiteModal(site = null) {
         document.getElementById('site-url').value = site.url;
         document.getElementById('site-icon').value = site.icon || '';
         document.getElementById('site-category').value = site.categoryId;
-        document.getElementById('site-bg-color').value = site.bgColor || '#0f3460';
+        document.getElementById('site-bg-color').value = site.bgColor || '#764ba2';
     } else {
         document.getElementById('site-id').value = '';
-        document.getElementById('site-bg-color').value = '#0f3460';
+        document.getElementById('site-bg-color').value = '#764ba2';
     }
 
     modal.classList.remove('hidden');
@@ -193,7 +251,7 @@ export function openCategoryModal(category = null) {
         document.getElementById('category-color').value = category.color;
     } else {
         document.getElementById('category-id').value = '';
-        document.getElementById('category-color').value = '#e94560';
+        document.getElementById('category-color').value = '#f093fb';
     }
 
     modal.classList.remove('hidden');
@@ -207,13 +265,13 @@ export function closeCategoryModal() {
 // 显示主界面
 export function showMainApp() {
     document.getElementById('welcome-screen').classList.add('hidden');
-    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').classList.remove('hidden');
 }
 
 // 显示欢迎屏幕
 export function showWelcomeScreen() {
     document.getElementById('welcome-screen').classList.remove('hidden');
-    document.getElementById('app').style.display = 'none';
+    document.getElementById('app').classList.add('hidden');
 }
 
 // 获取当前分类ID
