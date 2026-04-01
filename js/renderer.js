@@ -1,6 +1,13 @@
 // js/renderer.js
 import * as storage from './storage.js';
 
+// HTML 转义函数，防止 XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 let currentCategoryId = 'all';
 
 // 渲染分类列表
@@ -18,17 +25,17 @@ export function renderCategories() {
             <span>全部网站</span>
         </li>
         ${data.categories.map(cat => `
-            <li data-id="${cat.id}" class="${currentCategoryId === cat.id ? 'active' : ''}">
+            <li data-id="${escapeHtml(cat.id)}" class="${currentCategoryId === cat.id ? 'active' : ''}">
                 <span class="color-dot" style="background-color: ${cat.color}"></span>
-                <span>${cat.name}</span>
-                ${cat.id !== 'default' ? '<button class="delete-category" data-id="${cat.id}">×</button>' : ''}
+                <span>${escapeHtml(cat.name)}</span>
+                ${cat.id !== 'default' ? `<button class="delete-category" data-id="${escapeHtml(cat.id)}">×</button>` : ''}
             </li>
         `).join('')}
     `;
 
     // 渲染网站表单的分类选择
     select.innerHTML = data.categories.map(cat =>
-        `<option value="${cat.id}">${cat.name}</option>`
+        `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`
     ).join('');
 
     // 绑定分类点击事件
@@ -73,15 +80,15 @@ export function renderSites() {
     }
 
     grid.innerHTML = sites.map(site => {
-        const iconUrl = site.icon || getFaviconUrl(site.url);
+        const iconUrl = escapeHtml(site.icon || getFaviconUrl(site.url));
         return `
-            <div class="site-card" data-id="${site.id}" style="background-color: ${site.bgColor || 'var(--card-bg)'}">
+            <div class="site-card" data-id="${escapeHtml(site.id)}" style="background-color: ${site.bgColor || 'var(--card-bg)'}">
                 <div class="card-actions">
-                    <button class="edit-btn" data-id="${site.id}">✎</button>
-                    <button class="delete-btn" data-id="${site.id}">×</button>
+                    <button class="edit-btn" data-id="${escapeHtml(site.id)}">✎</button>
+                    <button class="delete-btn" data-id="${escapeHtml(site.id)}">×</button>
                 </div>
-                <img src="${iconUrl}" alt="${site.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🌐</text></svg>'">
-                <span class="site-name">${site.name}</span>
+                <img src="${iconUrl}" alt="${escapeHtml(site.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🌐</text></svg>'">
+                <span class="site-name">${escapeHtml(site.name)}</span>
             </div>
         `;
     }).join('');
