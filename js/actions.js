@@ -85,6 +85,32 @@ export function initActions() {
         renderer.renderSites();
     });
 
+    // 网址输入失焦时检测图标
+    document.getElementById('site-url').addEventListener('blur', async (e) => {
+        const url = e.target.value.trim();
+        const iconInput = document.getElementById('site-icon');
+        const iconStatus = document.getElementById('icon-status');
+
+        // 如果用户已经手动输入了图标，不做处理
+        if (iconInput.value.trim()) {
+            return;
+        }
+
+        if (url) {
+            const faviconUrl = renderer.getFaviconUrl(url);
+            if (faviconUrl) {
+                const isLoadable = await renderer.checkIconLoadable(faviconUrl);
+                if (!isLoadable && iconStatus) {
+                    iconStatus.textContent = '图标加载失败，可手动上传';
+                    iconStatus.classList.add('error');
+                } else if (iconStatus) {
+                    iconStatus.textContent = '自动获取或手动输入';
+                    iconStatus.classList.remove('error');
+                }
+            }
+        }
+    });
+
     // 取消网站表单
     document.getElementById('cancel-site-btn').addEventListener('click', () => {
         renderer.closeSiteModal();
