@@ -62,6 +62,11 @@ export function initActions() {
             return;
         }
 
+        if (!siteData.name) {
+            alert('请输入网站名称');
+            return;
+        }
+
         // 自动获取favicon
         if (!siteData.icon) {
             siteData.icon = renderer.getFaviconUrl(siteData.url);
