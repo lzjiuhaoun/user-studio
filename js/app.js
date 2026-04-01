@@ -1,21 +1,59 @@
 // js/app.js
-import * as storage from './storage.js';
 import * as renderer from './renderer.js';
-import { initActions } from './actions.js';
+import * as storage from './storage.js';
+import * as actions from './actions.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 初始化事件绑定
-    initActions();
+// 时钟更新
+function updateTime() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timeDisplay = document.getElementById('time-display');
+    if (timeDisplay) {
+        timeDisplay.textContent = `${hours}:${minutes}`;
+    }
+}
 
-    // 检查浏览器兼容性
-    if (!storage.isSupported()) {
-        document.getElementById('welcome-screen').innerHTML = `
-            <h1>浏览器不支持</h1>
-            <p>请使用 Chrome、Edge 或 Opera 等支持 File System Access API 的浏览器</p>
-        `;
+// 初始化时钟
+function initClock() {
+    updateTime();
+    setInterval(updateTime, 1000);
+}
+
+// 初始化搜索
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            renderer.filterSites(query);
+        });
+    }
+}
+
+// 检查浏览器兼容性
+function checkBrowserCompatibility() {
+    if (!('showOpenFilePicker' in window)) {
+        return false;
+    }
+    return true;
+}
+
+// 初始化应用
+export function init() {
+    if (!checkBrowserCompatibility()) {
         return;
     }
 
-    // 默认显示欢迎屏幕
-    renderer.showWelcomeScreen();
-});
+    // 初始化时钟
+    initClock();
+
+    // 初始化搜索
+    initSearch();
+
+    // 初始化所有事件绑定
+    actions.initActions();
+}
+
+// 启动应用
+init();
