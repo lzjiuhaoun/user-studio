@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "id": "default",
+      "name": "未分类",
+      "color": "#808080"
+    },
+    {
+      "name": "代码仓库",
+      "color": "#e7dfe0",
+      "id": "id-1775011327957-ig75kv5mk"
+    }
+  ],
+  "sites": [
+    {
+      "name": "github",
+      "url": "https://www.github.com",
+      "icon": "https://www.google.com/s2/favicons?domain=www.github.com&sz=64",
+      "categoryId": "id-1775011327957-ig75kv5mk",
+      "bgColor": "#202122",
+      "id": "id-1775011293830-dcxqodun9"
+    }
+  ]
+}
