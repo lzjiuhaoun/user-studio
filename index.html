@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人工作站</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- 引入 Tailwind CSS 进行样式排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 自定义字体 */
+        .font-sans {
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .font-mono {
+            font-family: ui-monospace, monospace;
+        }
+    </style>
 </head>
 <body>
+    <!-- 浏览器兼容性检测 -->
     <script>
-        // 浏览器兼容性检测
         if (!('showOpenFilePicker' in window)) {
             document.body.innerHTML = `
-                <div class="welcome-screen">
-                    <div class="welcome-card">
-                        <h1>浏览器不支持</h1>
-                        <p>File System Access API 目前仅在 Chrome、Edge、Opera 等 Chromium 系浏览器中支持。<br>请使用这些浏览器访问此页面。</p>
+                <div class="min-h-screen w-full relative flex flex-col items-center justify-center overflow-hidden font-sans text-white"
+                     style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+                    <div class="z-10 text-center px-4">
+                        <h1 class="text-4xl font-bold mb-4">浏览器不支持</h1>
+                        <p class="text-white/80">File System Access API 目前仅在 Chrome、Edge、Opera 等 Chromium 系浏览器中支持。<br>请使用这些浏览器访问此页面。</p>
                     </div>
                 </div>
             `;
@@ -22,99 +36,290 @@
     </script>
 
     <!-- 欢迎/文件选择界面 -->
-    <div id="welcome-screen" class="welcome-screen">
-        <div class="welcome-card">
-            <h1>个人工作站</h1>
-            <p>选择数据文件开始使用</p>
-            <div class="btn-group">
-                <button id="select-file-btn" class="btn-primary">选择数据文件</button>
-                <button id="create-file-btn" class="btn-secondary">创建新文件</button>
+    <div id="welcome-screen" class="min-h-screen w-full relative flex flex-col items-center justify-center overflow-hidden font-sans"
+         style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative z-10 text-center px-4">
+            <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl max-w-md mx-auto">
+                <h1 class="text-4xl font-bold mb-4 text-white">个人工作站</h1>
+                <p class="text-white/80 mb-8">选择数据文件开始使用</p>
+                <div class="flex flex-col space-y-3">
+                    <button id="select-file-btn" class="w-full px-6 py-3 bg-white/20 hover:bg-white/30 border border-white/20 rounded-xl transition-all duration-300 font-medium text-white">
+                        选择数据文件
+                    </button>
+                    <button id="create-file-btn" class="w-full px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all duration-300 text-white/80">
+                        创建新文件
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 主应用 -->
-    <div id="app" class="hidden">
-        <!-- 侧边栏 -->
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <h2>分类</h2>
-                <button id="add-category-btn" class="btn-icon" title="添加分类">+</button>
-            </div>
-            <ul id="category-list" class="category-list"></ul>
-        </aside>
+    <!-- 主页面 -->
+    <div id="app" class="min-h-screen w-full relative flex flex-col items-center overflow-hidden font-sans text-white selection:bg-white/30"
+         style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop'); background-size: cover; background-position: center;">
 
-        <!-- 主内容区 -->
-        <main id="main-content" class="main-content">
-            <div class="top-area">
-                <button id="toggle-sidebar-btn" class="btn-icon">☰</button>
-                <div class="search-container">
-                    <input type="text" id="search-input" class="search-input" placeholder="搜索书签...">
-                </div>
-                <div id="time-display" class="time-display">00:00</div>
-                <button id="add-site-btn" class="btn-primary">添加网站</button>
+        <!-- 动态背景遮罩 -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+        <!-- 顶部工具栏 -->
+        <header class="w-full p-6 flex justify-between items-center z-10">
+            <div id="add-component-btn" class="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 hover:bg-white/20 hover:border-white/40 transition cursor-pointer duration-300">
+                <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+                <span class="text-sm font-medium">添加组件</span>
             </div>
-            <div id="sites-grid" class="sites-grid"></div>
+            <div class="flex items-center space-x-4">
+                <button id="fullscreen-btn" class="p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 hover:border-white/40 transition duration-300">
+                    <i data-lucide="maximize" class="w-[18px] h-[18px]"></i>
+                </button>
+                <button id="settings-btn" class="p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 hover:border-white/40 transition duration-300">
+                    <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主体内容 -->
+        <main class="flex-1 w-full max-w-5xl flex flex-col items-center justify-center z-10 px-4 pb-12">
+
+            <!-- 时间显示 -->
+            <div id="clock-container" class="text-center mb-8 drop-shadow-2xl cursor-default select-none hover:scale-105 transition-transform duration-500">
+                <h1 id="clock-time" class="text-7xl md:text-9xl font-bold tracking-wider font-mono">
+                    00:00
+                </h1>
+                <p id="clock-date" class="text-lg md:text-xl font-medium mt-4 text-white/90 tracking-wide">
+                    加载中...
+                </p>
+            </div>
+
+            <!-- 搜索栏 -->
+            <form id="search-form" class="w-full max-w-2xl mb-12 relative group">
+                <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="text-white/70 group-hover:text-white transition-colors w-[22px] h-[22px]"></i>
+                </div>
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="搜索你想知道的..."
+                    class="w-full bg-white/10 hover:bg-white/20 focus:bg-white/20 backdrop-blur-md border border-white/20 text-white placeholder-white/60 rounded-full py-4 pl-14 pr-6 text-lg outline-none shadow-lg transition-all duration-300 focus:shadow-2xl focus:ring-2 focus:ring-white/30"
+                />
+            </form>
+
+            <!-- 组件网格 -->
+            <div id="components-grid" class="w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+
+                <!-- 天气小组件 (2x2) -->
+                <div id="weather-widget" class="col-span-2 row-span-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-1 text-white/80">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                <span class="text-sm">北京市</span>
+                            </div>
+                            <h2 id="weather-temp" class="text-4xl font-bold mt-2">24°</h2>
+                        </div>
+                        <i data-lucide="cloud-sun" class="w-12 h-12 text-yellow-400 drop-shadow-md group-hover:scale-110 transition-transform duration-500"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <p id="weather-desc" class="text-lg font-medium">多云转晴</p>
+                        <div class="flex space-x-4 text-sm text-white/70">
+                            <span class="flex items-center"><i data-lucide="wind" class="w-3.5 h-3.5 mr-1"></i> <span id="weather-wind">3级</span></span>
+                            <span class="flex items-center"><i data-lucide="droplets" class="w-3.5 h-3.5 mr-1"></i> <span id="weather-humidity">45%</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 待办事项小组件 (2x2) -->
+                <div id="todo-widget" class="col-span-2 row-span-2 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer">
+                    <h3 class="font-semibold text-lg flex items-center mb-4">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 mr-2 text-green-400"></i>
+                        今日待办
+                    </h3>
+                    <ul id="todo-list" class="space-y-3 flex-1">
+                        <!-- 待办项动态生成 -->
+                    </ul>
+                </div>
+
+                <!-- 快捷方式图标区域 -->
+                <div id="shortcuts-container" class="col-span-2 md:col-span-4 lg:col-span-6 grid grid-cols-3 md:grid-cols-6 gap-4">
+                    <!-- 快捷方式动态生成 -->
+                </div>
+
+                <!-- 添加按钮 (1x1) -->
+                <div id="add-widget-btn" class="col-span-1 row-span-1 flex flex-col items-center justify-center group cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-white/5 backdrop-blur-md border border-white/10 border-dashed rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg group-hover:-translate-y-2 group-hover:border-white/40 transition-all duration-300">
+                        <i data-lucide="plus" class="w-8 h-8 text-white/50 group-hover:text-white group-hover:rotate-90 transition-all duration-300"></i>
+                    </div>
+                    <span class="mt-2 text-xs md:text-sm font-medium text-white/50 group-hover:text-white transition-colors">添加</span>
+                </div>
+
+            </div>
         </main>
+
+        <!-- 底部名言 -->
+        <footer id="quote-footer" class="absolute bottom-6 w-full text-center z-10 px-4">
+            <p id="quote-text" class="text-white/60 text-sm font-light hover:text-white/90 transition-colors cursor-pointer tracking-wide">
+                " 预测未来的最好方式就是去创造它。"
+            </p>
+        </footer>
     </div>
 
-    <!-- 模态框：添加/编辑网站 -->
-    <div id="site-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3 id="site-modal-title">添加网站</h3>
-            <form id="site-form">
-                <input type="hidden" id="site-id">
-                <div class="form-group">
-                    <label for="site-name">名称</label>
-                    <input type="text" id="site-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="site-url">网址</label>
-                    <input type="url" id="site-url" required>
-                </div>
-                <div class="form-group">
-                    <label for="site-icon">图标URL</label>
-                    <input type="url" id="site-icon">
-                    <small id="icon-status">自动获取或手动输入</small>
-                </div>
-                <div class="form-group">
-                    <label for="site-category">分类</label>
-                    <select id="site-category"></select>
-                </div>
-                <div class="form-group">
-                    <label for="site-bg-color">背景色</label>
-                    <input type="color" id="site-bg-color" value="#764ba2">
-                </div>
-                <div class="form-actions">
-                    <button type="button" id="cancel-site-btn" class="btn-secondary">取消</button>
-                    <button type="submit" class="btn-primary">保存</button>
-                </div>
-            </form>
+    <!-- 模态框：添加网站 -->
+    <div id="site-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="site-modal-overlay"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="relative w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <h3 id="site-modal-title" class="text-xl font-semibold mb-6 flex items-center">
+                    <i data-lucide="globe" class="w-5 h-5 mr-2"></i>
+                    添加网站
+                </h3>
+                <form id="site-form" class="space-y-4">
+                    <input type="hidden" id="site-id">
+                    <div class="form-group">
+                        <label for="site-name" class="block text-sm font-medium text-white/80 mb-1">名称</label>
+                        <input type="text" id="site-name" required
+                               class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                    </div>
+                    <div class="form-group">
+                        <label for="site-url" class="block text-sm font-medium text-white/80 mb-1">网址</label>
+                        <input type="url" id="site-url" required
+                               class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                    </div>
+                    <div class="form-group">
+                        <label for="site-icon" class="block text-sm font-medium text-white/80 mb-1">图标URL</label>
+                        <input type="url" id="site-icon"
+                               class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                        <small class="text-white/50 text-xs">自动获取或手动输入</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="site-category" class="block text-sm font-medium text-white/80 mb-1">分类</label>
+                        <select id="site-category"
+                                class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="site-bg-color" class="block text-sm font-medium text-white/80 mb-1">背景色</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="site-bg-color" value="#7b68ee"
+                                   class="w-12 h-12 rounded-xl border border-white/20 cursor-pointer">
+                            <span class="text-white/60 text-sm">选择图标背景色</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" id="cancel-site-btn" class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all">
+                            取消
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition-all font-medium">
+                            保存
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- 模态框：添加/编辑分类 -->
-    <div id="category-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3 id="category-modal-title">添加分类</h3>
-            <form id="category-form">
-                <input type="hidden" id="category-id">
-                <div class="form-group">
-                    <label for="category-name">名称</label>
-                    <input type="text" id="category-name" required>
+    <!-- 模态框：添加分类 -->
+    <div id="category-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="category-modal-overlay"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="relative w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <h3 id="category-modal-title" class="text-xl font-semibold mb-6 flex items-center">
+                    <i data-lucide="folder" class="w-5 h-5 mr-2"></i>
+                    添加分类
+                </h3>
+                <form id="category-form" class="space-y-4">
+                    <input type="hidden" id="category-id">
+                    <div class="form-group">
+                        <label for="category-name" class="block text-sm font-medium text-white/80 mb-1">名称</label>
+                        <input type="text" id="category-name" required
+                               class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                    </div>
+                    <div class="form-group">
+                        <label for="category-color" class="block text-sm font-medium text-white/80 mb-1">颜色</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="category-color" value="#7b68ee"
+                                   class="w-12 h-12 rounded-xl border border-white/20 cursor-pointer">
+                            <span class="text-white/60 text-sm">选择分类颜色</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" id="cancel-category-btn" class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all">
+                            取消
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition-all font-medium">
+                            保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：添加待办 -->
+    <div id="todo-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="todo-modal-overlay"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="relative w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <h3 class="text-xl font-semibold mb-6 flex items-center">
+                    <i data-lucide="check-circle-2" class="w-5 h-5 mr-2 text-green-400"></i>
+                    添加待办
+                </h3>
+                <form id="todo-form" class="space-y-4">
+                    <div class="form-group">
+                        <label for="todo-text" class="block text-sm font-medium text-white/80 mb-1">内容</label>
+                        <input type="text" id="todo-text" required
+                               class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/30 transition-all">
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" id="cancel-todo-btn" class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all">
+                            取消
+                        </button>
+                        <button type="submit" class="flex-1 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl transition-all font-medium">
+                            保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：组件选择 -->
+    <div id="component-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="component-modal-overlay"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="relative w-full max-w-lg bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <h3 class="text-xl font-semibold mb-6 flex items-center">
+                    <i data-lucide="layout-grid" class="w-5 h-5 mr-2"></i>
+                    添加组件
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="component-option p-4 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center" data-type="shortcut">
+                        <i data-lucide="globe" class="w-8 h-8 mb-2 text-blue-400"></i>
+                        <span class="text-sm font-medium">快捷方式</span>
+                    </button>
+                    <button class="component-option p-4 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center" data-type="todo">
+                        <i data-lucide="check-circle-2" class="w-8 h-8 mb-2 text-green-400"></i>
+                        <span class="text-sm font-medium">待办事项</span>
+                    </button>
+                    <button class="component-option p-4 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center" data-type="weather">
+                        <i data-lucide="cloud-sun" class="w-8 h-8 mb-2 text-yellow-400"></i>
+                        <span class="text-sm font-medium">天气</span>
+                    </button>
+                    <button class="component-option p-4 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/20 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center" data-type="category">
+                        <i data-lucide="folder" class="w-8 h-8 mb-2 text-purple-400"></i>
+                        <span class="text-sm font-medium">分类</span>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="category-color">颜色</label>
-                    <input type="color" id="category-color" value="#f093fb">
-                </div>
-                <div class="form-actions">
-                    <button type="button" id="cancel-category-btn" class="btn-secondary">取消</button>
-                    <button type="submit" class="btn-primary">保存</button>
-                </div>
-            </form>
+                <button id="close-component-modal" class="mt-6 w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-all">
+                    关闭
+                </button>
+            </div>
         </div>
     </div>
 
     <script type="module" src="js/app.js"></script>
+    <script>
+        // 初始化 Lucide 图标
+        lucide.createIcons();
+    </script>
 </body>
 </html>

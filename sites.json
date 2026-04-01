@@ -9,6 +9,16 @@
       "name": "代码仓库",
       "color": "#e7dfe0",
       "id": "id-1775011327957-ig75kv5mk"
+    },
+    {
+      "name": "代码仓库",
+      "color": "#3d1fe5",
+      "id": "id-1775030042042-sb5umdbl9"
+    },
+    {
+      "name": "bbbbbb",
+      "color": "#ff0000",
+      "id": "id-1775030140900-xbmxrh3i2"
     }
   ],
   "sites": [
@@ -16,9 +26,32 @@
       "name": "github",
       "url": "https://www.github.com",
       "icon": "https://www.google.com/s2/favicons?domain=www.github.com&sz=64",
-      "categoryId": "id-1775011327957-ig75kv5mk",
-      "bgColor": "#202122",
+      "categoryId": "default",
+      "bgColor": "#7bb0e5",
       "id": "id-1775011293830-dcxqodun9"
+    },
+    {
+      "name": "baidu",
+      "url": "https://www.baidu.com",
+      "icon": "https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png",
+      "categoryId": "default",
+      "bgColor": "#7c76a2",
+      "id": "id-1775029949365-nmeood68r"
     }
-  ]
+  ],
+  "todos": [
+    {
+      "id": "id-1775030131004-5dikvm2cy",
+      "text": "tttt",
+      "completed": false
+    }
+  ],
+  "weather": {
+    "city": "北京市",
+    "temp": 24,
+    "desc": "多云转晴",
+    "wind": "3级",
+    "humidity": "45%"
+  },
+  "quote": "预测未来的最好方式就是去创造它。"
 }

@@ -6,29 +6,29 @@ import * as actions from './actions.js';
 // 时钟更新
 function updateTime() {
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const timeDisplay = document.getElementById('time-display');
-    if (timeDisplay) {
-        timeDisplay.textContent = `${hours}:${minutes}`;
-    }
+
+    // 格式化时间 00:00
+    const timeString = now.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+
+    // 格式化日期
+    const dateOptions = { month: 'long', day: 'numeric', weekday: 'long' };
+    const dateString = now.toLocaleDateString('zh-CN', dateOptions);
+
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+
+    if (timeEl) timeEl.textContent = timeString;
+    if (dateEl) dateEl.textContent = dateString;
 }
 
 // 初始化时钟
 function initClock() {
     updateTime();
     setInterval(updateTime, 1000);
-}
-
-// 初始化搜索
-function initSearch() {
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            renderer.filterSites(query);
-        });
-    }
 }
 
 // 检查浏览器兼容性
@@ -47,9 +47,6 @@ export function init() {
 
     // 初始化时钟
     initClock();
-
-    // 初始化搜索
-    initSearch();
 
     // 初始化所有事件绑定
     actions.initActions();

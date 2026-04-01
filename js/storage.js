@@ -5,7 +5,16 @@ const DEFAULT_DATA = {
     categories: [
         { id: 'default', name: '未分类', color: '#808080' }
     ],
-    sites: []
+    sites: [],
+    todos: [],
+    weather: {
+        city: '北京市',
+        temp: 24,
+        desc: '多云转晴',
+        wind: '3级',
+        humidity: '45%'
+    },
+    quote: '预测未来的最好方式就是去创造它。'
 };
 
 // 检查浏览器是否支持 File System Access API
@@ -63,6 +72,10 @@ export async function loadFile() {
         if (!data.categories || data.categories.length === 0) {
             data.categories = [...DEFAULT_DATA.categories];
         }
+        // 确保有必要的字段
+        if (!data.todos) data.todos = [];
+        if (!data.weather) data.weather = { ...DEFAULT_DATA.weather };
+        if (!data.quote) data.quote = DEFAULT_DATA.quote;
         return data;
     } catch (err) {
         console.error('加载文件失败:', err);
@@ -147,5 +160,44 @@ export async function deleteCategory(id) {
             site.categoryId = 'default';
         }
     });
+    return await saveFile();
+}
+
+// 添加待办
+export async function addTodo(todo) {
+    if (!data) return false;
+    data.todos.push(todo);
+    return await saveFile();
+}
+
+// 更新待办
+export async function updateTodo(id, updates) {
+    if (!data) return false;
+    const index = data.todos.findIndex(t => t.id === id);
+    if (index !== -1) {
+        data.todos[index] = { ...data.todos[index], ...updates };
+        return await saveFile();
+    }
+    return false;
+}
+
+// 删除待办
+export async function deleteTodo(id) {
+    if (!data) return false;
+    data.todos = data.todos.filter(t => t.id !== id);
+    return await saveFile();
+}
+
+// 更新天气
+export async function updateWeather(weather) {
+    if (!data) return false;
+    data.weather = { ...data.weather, ...weather };
+    return await saveFile();
+}
+
+// 更新名言
+export async function updateQuote(quote) {
+    if (!data) return false;
+    data.quote = quote;
     return await saveFile();
 }
